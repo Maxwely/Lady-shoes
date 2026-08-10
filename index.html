@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lady-shoes — Фирменная обувь с доставкой</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background: #f4f4f7; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; }
+        header { background: #fff; width: 100%; max-width: 450px; padding: 18px 15px; box-sizing: border-box; text-align: center; border-bottom: 1px solid #e0e0e0; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .logo-main { margin: 0; font-size: 26px; font-weight: 800; color: #8d10ac; letter-spacing: -0.5px; }
+        .logo-sub { margin: 4px 0 0 0; font-size: 13px; font-weight: 500; color: #666; letter-spacing: 1px; text-transform: uppercase; }
+        .header-phone { display: inline-block; margin-top: 8px; font-size: 15px; font-weight: 600; color: #00aa22; text-decoration: none; }
+        
+        .catalog { max-width: 450px; width: 100%; padding: 10px; box-sizing: border-box; }
+        
+        /* Карточка товара в общем каталоге */
+        .product-card { background: #fff; border-radius: 12px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        
+        /* Горизонтальная карусель внутри карточки */
+        .carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #fff; width: 100%; align-items: center; }
+        .carousel::-webkit-scrollbar { display: none; }
+        
+        /* Пропорции 3:4 (где 3 — ширина, 4 — высота). Картинка помещается целиком */
+        .carousel img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: contain; flex-shrink: 0; scroll-snap-align: start; display: block; background: #fff; }
+        
+        .info { padding: 15px; }
+        .logo-badge { display: inline-block; background: #8d10ac; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 8px; }
+        .title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 6px; }
+        .price { font-size: 20px; font-weight: bold; color: #00aa22; margin-bottom: 12px; }
+        .desc { font-size: 14px; color: #444; line-height: 1.4; white-space: pre-line; margin-bottom: 15px; }
+        
+        /* Панель с кнопками мессенджеров */
+        .actions-panel { display: flex; flex-direction: column; gap: 8px; }
+        .btn { display: block; padding: 11px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; color: #fff; }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-telegram { background-color: #0088cc; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="logo-main">Lady-shoes</h1>
+        <div class="logo-sub">Фирменная обувь</div>
+        <a href="tel:+79340109983" class="header-phone">+7 (934) 010-99-83</a>
+    </header>
+
+    <!-- Сюда скрипт выведет все карточки товаров -->
+    <div class="catalog" id="catalogList"></div>
+
+    <script src="products.js"></script>
+    <script>
+        // Контакты для генерации автоматических ссылок в мессенджеры
+        const myPhoneWa = "79620067050";   
+        const myTg = "sundayboom";            
+
+        const catalogList = document.getElementById('catalogList');
+        
+        // Цикл для сборки карточек товаров на главной странице
+        for (let id in products) {
+            const item = products[id];
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            const carousel = document.createElement('div');
+            carousel.className = 'carousel';
+            
+            // Запрашиваем до 10 картинок для карусели (-001, -002 и т.д.)
+            for (let i = 1; i <= 10; i++) {
+                const img = document.createElement('img');
+                const num = String(i).padStart(3, '0'); 
+                img.src = `images/${item.img}-${num}.webp`;
+                img.alt = `Фото ${i}`;
+                img.loading = "lazy";
+                // Если картинки с таким номером в папке нет, она автоматически удаляется из кода
+                img.onerror = function() { this.remove(); };
+                carousel.appendChild(img);
+            }
+            
+            // Текст готового шаблона сообщения при клике на покупку
+            const messageText = `Здравствуйте! Я хочу купить: ${item.title}`;
+            const waLink = `https://wa.me/${myPhoneWa}?text=${encodeURIComponent(messageText)}`;
+            const tgLink = `https://t.me/${myTg}`;
+            
+            card.appendChild(carousel);
+            card.innerHTML += `
+                <div class="info">
+                    
+                    <div class="title">${item.title}</div>
+                    <div class="price">${item.price}</div>
+                    <div class="desc">${item.desc}</div>
+                    <div class="actions-panel">
+                        <a href="${waLink}" class="btn btn-whatsapp" target="_blank">Написать в WhatsApp</a>
+                        <a href="${tgLink}" class="btn btn-telegram" target="_blank">Написать в Telegram</a>
+                    </div>
+                </div>
+            `;
+            
+            catalogList.appendChild(card);
+        }
+    </script>
+</body>
+</html>
